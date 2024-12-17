@@ -1,10 +1,13 @@
 import logging
 import pandas as pd
 from tqdm import tqdm
+from pathlib import Path
 from typing import Dict, Any
 from naptha_sdk.client.node import Node
 
 logger = logging.getLogger(__name__)
+
+file_path = Path(__file__).parent / "data" / "wikipedia_kb.parquet"
 
 async def run(kb_run: Dict[str, Any], *args, **kwargs):
     """
@@ -25,7 +28,7 @@ async def run(kb_run: Dict[str, Any], *args, **kwargs):
     node_client = Node(kb_run.kb_deployment.kb_node_url)
     
     # Read the parquet file
-    df = pd.read_parquet("./wikipedia_kb/data/wikipedia_kb.parquet")
+    df = pd.read_parquet(file_path)
     
     try:
         # Create the table
