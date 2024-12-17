@@ -22,7 +22,7 @@ async def run(kb_run: Dict[str, Any], *args, **kwargs):
     schema = kb_config['schema']
 
     # Create a node client
-    node_client = Node(kb_run.kb_node_url)
+    node_client = Node(kb_run.kb_deployment.kb_node_url)
     
     # Read the parquet file
     df = pd.read_parquet("./wikipedia_kb/data/wikipedia_kb.parquet")
