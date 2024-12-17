@@ -7,7 +7,7 @@ from naptha_sdk.client.node import Node
 
 logger = logging.getLogger(__name__)
 
-file_path = Path(__file__).parent / "data" / "wikipedia_kb.parquet"
+file_path = Path(__file__).parent / "data" / "wikipedia_kb_sample.parquet"
 
 async def run(kb_run: Dict[str, Any], *args, **kwargs):
     """
@@ -33,7 +33,7 @@ async def run(kb_run: Dict[str, Any], *args, **kwargs):
     try:
         # Create the table
         logger.info(f"Creating table {table_name}")
-        await node_client.create_dynamic_table(table_name, schema)
+        await node_client.create_table(table_name, schema)
         
         # Convert DataFrame rows to dictionaries and add them to the table
         logger.info("Adding rows to table")
@@ -45,10 +45,36 @@ async def run(kb_run: Dict[str, Any], *args, **kwargs):
                 "text": str(row['text'])
             }
             
-            await node_client.add_dynamic_row(table_name, row_data)
+            await node_client.add_row(table_name, row_data)
         
         logger.info(f"Successfully populated {table_name} table with {len(df)} rows")
 
         
     except Exception as e:
         raise
+
+
+if __name__ == "__main__":
+    from naptha_sdk.client.node import Node
+    import asyncio
+    import json
+    from pydantic import BaseModel
+
+    with open("./wikipedia_kb/configs/knowledge_base_deployment.json", "r") as f:
+        kb_deployment = json.load(f)
+    
+    kb_run = {
+        "kb_deployment": kb_deployment
+    }
+
+    class KBDeployment(BaseModel):
+        kb_node_url: str
+        kb_config: Dict[str, Any]
+    class KBRun(BaseModel):
+        kb_deployment: KBDeployment
+
+    kb_run = KBRun(**kb_run)
+
+    print(kb_run)
+
+    asyncio.run(run(kb_run))
