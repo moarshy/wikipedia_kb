@@ -16,7 +16,12 @@ class WikipediaKB:
         self.kb_deployment = kb_run.kb_deployment
         self.kb_node_url = self.kb_deployment.kb_node_url
         self.kb_config = self.kb_deployment.kb_config
-        self.input_schema = InputSchema(**self.kb_run.inputs)
+
+        if isinstance(self.kb_run.inputs, dict):
+            self.input_schema = InputSchema(**self.kb_run.inputs)
+        else:
+            self.input_schema = InputSchema.model_validate(self.kb_run.inputs)
+
         self.mode = self.input_schema.mode
         self.query = self.input_schema.query
 
