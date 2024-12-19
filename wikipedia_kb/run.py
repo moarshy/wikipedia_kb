@@ -1,4 +1,6 @@
 import logging
+import json
+import random
 import pandas as pd
 from tqdm import tqdm
 from pathlib import Path
@@ -30,6 +32,8 @@ class WikipediaKB:
             return await self.init()
         elif self.mode == "query":
             return await self.run_query()
+        elif self.mode == "add_data":
+            return await self.add_data()
         else:
             raise ValueError(f"Invalid mode: {self.mode}")
         
@@ -60,6 +64,31 @@ class WikipediaKB:
         logger.info(f"Successfully populated {table_name} table with {len(df)} rows")
 
         return {"status": "success", "message": f"Successfully populated {table_name} table with {len(df)} rows"}
+    
+    async def add_data(self, *args, **kwargs):
+        node_client = Node(self.kb_node_url)
+        table_name = self.kb_config['table_name']
+        schema = self.kb_config['schema']
+
+        # Add rows to the table
+        data = json.loads(self.input_schema.data)
+
+        logger.info(f"Adding {len(data)} rows to table {table_name}")
+        for row in tqdm(data, total=len(data)):
+            # if row has no id, generate a random one
+            if 'id' not in row:
+                row['id'] = random.randint(1, 1000000)
+
+            # make sure title are not in the table
+            if await node_client.query_table(table_name, {'title': row['title']}):
+                logger.info(f"Title {row['title']} already exists in table {table_name}, skipping")
+                continue
+
+            await node_client.add_row(table_name, row)
+
+        logger.info(f"Successfully added {len(data)} rows to table {table_name}")
+
+        return {"status": "success", "message": f"Successfully added {len(data)} rows to table {table_name}"}
 
     async def run_query(self, *args, **kwargs):
         node_client = Node(self.kb_node_url)
