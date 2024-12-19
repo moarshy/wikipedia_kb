@@ -22,9 +22,9 @@ class WikipediaKB:
 
     async def run(self, *args, **kwargs):
         if self.mode == "init":
-            await self.init()
+            return await self.init()
         elif self.mode == "query":
-            await self.query()
+            return await self.run_query()
         else:
             raise ValueError(f"Invalid mode: {self.mode}")
         
@@ -56,7 +56,7 @@ class WikipediaKB:
 
         return {"status": "success", "message": f"Successfully populated {table_name} table with {len(df)} rows"}
 
-    async def query(self, *args, **kwargs):
+    async def run_query(self, *args, **kwargs):
         node_client = Node(self.kb_node_url)
         table_name = self.kb_config['table_name']
         schema = self.kb_config['schema']
