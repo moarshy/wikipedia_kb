@@ -80,8 +80,8 @@ class WikipediaKB:
                 row['id'] = random.randint(1, 1000000)
 
             # make sure title are not in the table
-            if await node_client.query_table(table_name, condition={'title': row['title']}):
-                logger.info(f"Title {row['title']} already exists in table {table_name}, skipping")
+            results = await node_client.query_table(table_name, condition={'title': row['title']})
+            if results["rows"]:
                 continue
 
             await node_client.add_row(table_name, row)
