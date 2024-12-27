@@ -15,8 +15,7 @@ file_path = Path(__file__).parent / "data" / "wikipedia_kb_sample.parquet"
 class WikipediaKB:
     def __init__(self, kb_run: Dict[str, Any]):
         self.kb_run = kb_run
-        self.kb_deployment = kb_run.kb_deployment
-        self.kb_node_url = self.kb_deployment.kb_node_url
+        self.kb_deployment = kb_run.deployment
         self.kb_config = self.kb_deployment.kb_config
 
         if isinstance(self.kb_run.inputs, dict):
@@ -38,7 +37,7 @@ class WikipediaKB:
             raise ValueError(f"Invalid mode: {self.mode}")
         
     async def init(self, *args, **kwargs):
-        node_client = Node(self.kb_node_url)
+        node_client = Node(self.kb_deployment.node)
         table_name = self.kb_config['table_name']
         schema = self.kb_config['schema']
 
@@ -66,7 +65,7 @@ class WikipediaKB:
         return {"status": "success", "message": f"Successfully populated {table_name} table with {len(df)} rows"}
     
     async def add_data(self, *args, **kwargs):
-        node_client = Node(self.kb_node_url)
+        node_client = Node(self.kb_deployment.node)
         table_name = self.kb_config['table_name']
         schema = self.kb_config['schema']
 
@@ -91,7 +90,7 @@ class WikipediaKB:
         return {"status": "success", "message": f"Successfully added {len(data)} rows to table {table_name}"}
 
     async def run_query(self, *args, **kwargs):
-        node_client = Node(self.kb_node_url)
+        node_client = Node(self.kb_deployment.node)
         table_name = self.kb_config['table_name']
         schema = self.kb_config['schema']
 
