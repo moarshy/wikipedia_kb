@@ -13,15 +13,15 @@ file_path = Path(__file__).parent / "data" / "wikipedia_kb_sample.parquet"
 
 
 class WikipediaKB:
-    def __init__(self, kb_run: Dict[str, Any]):
-        self.kb_run = kb_run
-        self.kb_deployment = kb_run.deployment
-        self.kb_config = self.kb_deployment.kb_config
+    def __init__(self, module_run: Dict[str, Any]):
+        self.module_run = module_run
+        self.deployment = module_run.deployment
+        self.config = self.deployment.config
 
-        if isinstance(self.kb_run.inputs, dict):
-            self.input_schema = InputSchema(**self.kb_run.inputs)
+        if isinstance(self.module_run.inputs, dict):
+            self.input_schema = InputSchema(**self.module_run.inputs)
         else:
-            self.input_schema = InputSchema.model_validate(self.kb_run.inputs)
+            self.input_schema = InputSchema.model_validate(self.module_run.inputs)
 
         self.mode = self.input_schema.mode
         self.query = self.input_schema.query
@@ -37,9 +37,9 @@ class WikipediaKB:
             raise ValueError(f"Invalid mode: {self.mode}")
         
     async def init(self, *args, **kwargs):
-        node_client = Node(self.kb_deployment.node)
-        table_name = self.kb_config['table_name']
-        schema = self.kb_config['schema']
+        node_client = Node(self.deployment.node)
+        table_name = self.config['table_name']
+        schema = self.config['schema']
 
         # Create the table
         logger.info(f"Creating table {table_name}")
@@ -65,9 +65,9 @@ class WikipediaKB:
         return {"status": "success", "message": f"Successfully populated {table_name} table with {len(df)} rows"}
     
     async def add_data(self, *args, **kwargs):
-        node_client = Node(self.kb_deployment.node)
-        table_name = self.kb_config['table_name']
-        schema = self.kb_config['schema']
+        node_client = Node(self.deployment.node)
+        table_name = self.config['table_name']
+        schema = self.config['schema']
 
         # Add rows to the table
         data = json.loads(self.input_schema.data)
@@ -90,9 +90,9 @@ class WikipediaKB:
         return {"status": "success", "message": f"Successfully added {len(data)} rows to table {table_name}"}
 
     async def run_query(self, *args, **kwargs):
-        node_client = Node(self.kb_deployment.node)
-        table_name = self.kb_config['table_name']
-        schema = self.kb_config['schema']
+        node_client = Node(self.deployment.node)
+        table_name = self.config['table_name']
+        schema = self.config['schema']
 
         # Query the table
         logger.info(f"Querying table {table_name} with query: {self.query}")
@@ -102,11 +102,11 @@ class WikipediaKB:
         return {"status": "success", "message": f"Query results: {results}"}
 
 
-async def run(kb_run: Dict[str, Any], *args, **kwargs):
+async def run(module_run: Dict[str, Any], *args, **kwargs):
     """
     Run the Wikipedia Knowledge Base deployment
     Args:
-        kb_run: Knowledge base run configuration containing deployment details
+        module_run: Module run configuration containing deployment details
     """
-    wikipedia_kb = WikipediaKB(kb_run)
+    wikipedia_kb = WikipediaKB(module_run)
     return await wikipedia_kb.run()
