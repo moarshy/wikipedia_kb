@@ -38,8 +38,8 @@ class WikipediaKB:
         
     async def init(self, *args, **kwargs):
         node_client = Node(self.deployment.node)
-        table_name = self.config['table_name']
-        schema = self.config['schema']
+        table_name = self.config.table_name
+        schema = self.config.schema
 
         # Create the table
         logger.info(f"Creating table {table_name}")
@@ -66,8 +66,8 @@ class WikipediaKB:
     
     async def add_data(self, *args, **kwargs):
         node_client = Node(self.deployment.node)
-        table_name = self.config['table_name']
-        schema = self.config['schema']
+        table_name = self.config.table_name
+        schema = self.config.schema
 
         # Add rows to the table
         data = json.loads(self.input_schema.data)
@@ -91,8 +91,8 @@ class WikipediaKB:
 
     async def run_query(self, *args, **kwargs):
         node_client = Node(self.deployment.node)
-        table_name = self.config['table_name']
-        schema = self.config['schema']
+        table_name = self.config.table_name
+        schema = self.config.schema
 
         # Query the table
         logger.info(f"Querying table {table_name} with query: {self.query}")
