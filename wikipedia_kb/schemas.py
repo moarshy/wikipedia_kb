@@ -3,9 +3,8 @@ from typing import Literal, Optional, Dict, Any
 from naptha_sdk.schemas import KBConfig
 
 class InputSchema(BaseModel):
-    mode: Literal["init", "query", "add_data"]
-    query: Optional[str] = None
-    data: Optional[str] = None
+    function_name: Literal["init", "run_query", "add_data", "delete_table", "delete_row", "list_rows"]
+    function_input_data: Optional[Dict[str, Any]] = None
 
 class WikipediaKBConfig(KBConfig):
     table_name: str

@@ -5,7 +5,8 @@
         "node": {"ip": "localhost"},
         "config": {
             "config_schema": "WikipediaKBConfig",
-            "table_name": "wikipedia_kb",
+            "storage_type": "db",
+            "path": "wikipedia_kb",
             "query_col": "title",
             "answer_col": "text",
             "schema": {
